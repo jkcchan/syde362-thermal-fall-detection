@@ -1,3 +1,5 @@
+import math
+from PIL import Image
 """
 interprets bin file and saves a PNG in target directory
 """
