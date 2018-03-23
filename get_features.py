@@ -87,24 +87,21 @@ def get_CCA_from_image(image, threshold = 115, show_image=False):
     return stats[max_area_index], chosen_box, thresh, img
 
 
-images = []
-threshold, chosen_box, stats, thresh, img = get_best_threshold('full-dataset/dataset7(rgb134).jpg', start=40)
-print "threshold used: "+str(threshold)
-im2,contours,hierarchy = cv.findContours(thresh, 1, 2)
-areas = []
-for cont in contours:
-    areas.append(cv.contourArea(cont))
-areas = np.array(areas)
-print "max area: "+ str(2700)
-cont = contours[np.argmax(areas[areas < 2700])]
-rect = cv.minAreaRect(cont)
-box = cv.boxPoints(rect)
-box = np.int0(box)
-images.append(thresh)
-a = cv.drawContours(thresh,[box],0,(255, 255,0),2)
-plt.imshow(thresh)
-plt.show()
-print "angle: " +str(rect[2])
-# print "length x width: " +str(rect[1])
-print "area: "+str(rect[1][0]*rect[1][1])
-print "bbox ratio: "+str(max(rect[1][0]/rect[1][1],rect[1][1]/rect[1][0]))
+def get_rotated_box(image_filename, output = False, max_area = 2700):
+    images = []
+    threshold, chosen_box, stats, thresh, img = get_best_threshold(image_filename, start=40)
+    im2,contours,hierarchy = cv.findContours(thresh, 1, 2)
+    areas = []
+    for cont in contours:
+        areas.append(cv.contourArea(cont))
+    areas = np.array(areas)
+    cont = contours[np.argmax(areas[areas < max_area])]
+    rect = cv.minAreaRect(cont)
+    if output:
+        box = cv.boxPoints(rect)
+        box = np.int0(box)
+        images.append(thresh)
+        a = cv.drawContours(thresh,[box],0,(255, 255,0),2)
+        plt.imshow(thresh)
+        plt.show()
+    return rect[1][0]*rect[1][1], max(rect[1][0]/rect[1][1],rect[1][1]/rect[1][0])
