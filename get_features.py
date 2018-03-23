@@ -5,31 +5,6 @@ import matplotlib.patches as patches
 import numpy as np
 import cv2 as cv
 
-images = []
-threshold, chosen_box, stats, thresh, img = get_best_threshold('full-dataset/dataset7(rgb134).jpg', start=40)
-print "threshold used: "+str(threshold)
-# chosen_box = cv2.convertScaleAbs(chosen_box)
-im2,contours,hierarchy = cv.findContours(thresh, 1, 2)
-# plt.imshow(chosen_box, cmap="gray")
-# plt.show()
-areas = []
-for cont in contours:
-    areas.append(cv.contourArea(cont))
-areas = np.array(areas)
-print "max area: "+ str(2700)
-cont = contours[np.argmax(areas[areas < 2700])]
-rect = cv.minAreaRect(cont)
-box = cv.boxPoints(rect)
-box = np.int0(box)
-images.append(thresh)
-a = cv.drawContours(thresh,[box],0,(255, 255,0),2)
-plt.imshow(thresh)
-plt.show()
-print "angle: " +str(rect[2])
-# print "length x width: " +str(rect[1])
-print "area: "+str(rect[1][0]*rect[1][1])
-print "bbox ratio: "+str(max(rect[1][0]/rect[1][1],rect[1][1]/rect[1][0]))
-
 def get_best_threshold(img_filename, start=30, max_steps =100, alpha=1):
     min_ratio = float("inf")
     index = -1
@@ -49,6 +24,7 @@ def get_best_threshold(img_filename, start=30, max_steps =100, alpha=1):
             final_thresh = thresh
             final_img = img
     return index, final_chosen_box, final_stats, final_thresh, final_img
+
 def get_ratio_of_image(img):
     #ratio of white to black
     a=cv2.countNonZero(img)
@@ -56,6 +32,7 @@ def get_ratio_of_image(img):
 #     print type(float(a))
 #     print (float(h)*float(w))
     return float(float(a)/(float(h)*float(w)))
+
 def get_CCA_from_image(image, threshold = 115, show_image=False):
     img = cv2.imread(image,0)
     h,w = img.shape[:2]
@@ -83,17 +60,6 @@ def get_CCA_from_image(image, threshold = 115, show_image=False):
     # The fourth cell is the centroid matrix
     centroids = output[3]
 
-#     print num_labels
-#     print labels, len(labels)
-#     print stats
-#     print centroids
-
-    # cv2.imshow('image',img)
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
-    # put a red dot, size 40, at 2 locations:
-    # plt.scatter(x=[centroids[0][0], centroids[1][0]], y=[centroids[0][1], centroids[1][1]], c='r', s=40)
-    # ax2 = plt.add_subplot(111, aspect='equal')
     max_area_index=-1
     for i in range(len(stats)):
         if stats[i][0]==0 and stats[i][1]==0:
@@ -113,10 +79,32 @@ def get_CCA_from_image(image, threshold = 115, show_image=False):
         elif stats[i][4] > stats[max_area_index][4]:
             max_area_index=i
             
-    # fig2.savefig('rect2.png', dpi=90, bbox_inches='tight')
     if show_image:
         ax.imshow(thresh, cmap='gray')
         plt.show()
     #crop
     chosen_box = thresh[stats[max_area_index][1]:stats[max_area_index][1]+stats[max_area_index][3],stats[max_area_index][0]:stats[max_area_index][0]+stats[max_area_index][2]]
     return stats[max_area_index], chosen_box, thresh, img
+
+
+images = []
+threshold, chosen_box, stats, thresh, img = get_best_threshold('full-dataset/dataset7(rgb134).jpg', start=40)
+print "threshold used: "+str(threshold)
+im2,contours,hierarchy = cv.findContours(thresh, 1, 2)
+areas = []
+for cont in contours:
+    areas.append(cv.contourArea(cont))
+areas = np.array(areas)
+print "max area: "+ str(2700)
+cont = contours[np.argmax(areas[areas < 2700])]
+rect = cv.minAreaRect(cont)
+box = cv.boxPoints(rect)
+box = np.int0(box)
+images.append(thresh)
+a = cv.drawContours(thresh,[box],0,(255, 255,0),2)
+plt.imshow(thresh)
+plt.show()
+print "angle: " +str(rect[2])
+# print "length x width: " +str(rect[1])
+print "area: "+str(rect[1][0]*rect[1][1])
+print "bbox ratio: "+str(max(rect[1][0]/rect[1][1],rect[1][1]/rect[1][0]))
