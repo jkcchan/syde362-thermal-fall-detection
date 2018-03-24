@@ -1,7 +1,5 @@
-from skimage import measure
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-%matplotlib inline
 import numpy as np
 import cv2
 
