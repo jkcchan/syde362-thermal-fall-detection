@@ -5,7 +5,6 @@ def get_CCA_from_image(image, threshold = 115, show_image=False):
     img = cv2.imread(image,0)
     h,w = img.shape[:2]
 
-    L = measure.label(img)
 
     ret, thresh = cv2.threshold(img,threshold,255,cv2.THRESH_BINARY_INV)
     
